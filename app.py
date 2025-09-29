@@ -123,6 +123,7 @@ from dotenv import load_dotenv
 
 import streamlit as st
 ST_AVAILABLE = True
+st.set_page_config(page_title="Hotel Quinto • Assistant", page_icon="🏨", layout="wide")
 
 # OpenAI import (optional)
 try:
@@ -375,8 +376,7 @@ def show_room_images(room, lang):
             st.warning(f"⚠️ Image not found: {p.name}")
 
 def main():
-    # Set page config at the very top of the UI function
-    st.set_page_config(page_title="Hotel Quinto • Assistant", page_icon="🏨", layout="wide")
+    # ...existing code...
     def sidebar_ui():
         st.sidebar.markdown("---")
         st.sidebar.markdown("### Booking Price Summary")
