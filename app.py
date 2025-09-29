@@ -1,26 +1,25 @@
+import streamlit as st
+from settings import USD_RATE, WHATSAPP_E164, CHECKIN, CHECKOUT, ACCEPTED_PAYMENTS, PROMOS
+
 # Booking summary card renderer for Streamlit
 def render_booking_card(
-    usd_per_person,
-    guests,
-    nights,
-    fx_rate_usd_to_cop,
-    rate_timestamp,
-    total_usd,
-    total_cop,
-    cop_per_person,
+    usd_per_person=None,
+    guests=None,
+    nights=None,
+    fx_rate_usd_to_cop=None,
+    rate_timestamp=None,
+    total_usd=None,
+    total_cop=None,
+    cop_per_person=None,
     asof_str=None,
 ):
     """
     Render a styled booking summary card in Streamlit.
     """
-    import streamlit as st
     from datetime import datetime
+    # Use argument if provided, else fallback to settings.USD_RATE
+    usd_per_person = float(usd_per_person) if usd_per_person is not None else float(USD_RATE)
     try:
-        from app import USD_RATE
-    except ImportError:
-        USD_RATE = 26.0
-    try:
-        usd_per_person = float(USD_RATE)  # Always use current USD_RATE
         guests = int(guests)
         nights = int(nights)
         fx_rate = float(fx_rate_usd_to_cop)
@@ -137,16 +136,11 @@ except Exception:
 # ──────────────────────────────────────────────────────────────────────────
 load_dotenv()
 
+
 BASE_DIR = Path(__file__).parent
 ASSETS = BASE_DIR / "assets"
 ASSETS.mkdir(parents=True, exist_ok=True)
-
 HOTEL_LAT, HOTEL_LON = 4.57898411319599, -75.73419087522693
-WHATSAPP_E164 = "573202190476"  # +57 320 219 0476
-CHECKIN, CHECKOUT = "4:00 PM", "12:00 PM"
-ACCEPTED_PAYMENTS = "Cash (COP) or bank transfer only — no card payments."
-USD_RATE = float(os.getenv("USD_RATE_PER_PERSON", "26"))  # per-person base (USD)
-PROMOS = {"CASHFLOW10": 10, "QUINTO15": 15}
 
 
 
