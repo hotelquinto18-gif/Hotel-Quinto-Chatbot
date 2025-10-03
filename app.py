@@ -1,10 +1,12 @@
 import streamlit as st
 st.set_page_config(
     page_title="Hotel Quinto • Assistant",
-    page_icon="🏨",
+    page_icon="assets/logo.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+from openai import OpenAI  # <-- ADD THIS LINE
 
 from settings import USD_RATE, WHATSAPP_E164, CHECKIN, CHECKOUT, ACCEPTED_PAYMENTS, PROMOS
 from datetime import datetime, date, timedelta
@@ -515,49 +517,50 @@ def main_ui():
             except Exception:
                 st.markdown(f"[**{TXT.get('ask_room_btn', 'Ask on WhatsApp')}**]({room_url})")
         st.markdown(f"**{TXT.get('view_photos_title', 'View Photos')}**")
-        buttons = (
-            [
-                ("Ver Habitación Estándar", "Aquí tienes la Habitación Estándar: 1 cama doble, estilo bambú, baño al frente."),
-                ("Ver Habitación Familiar", "Aquí tienes la Habitación Familiar: 2–3 camas dobles, baño privado, vista a montañas."),
-                ("Ver Habitación Grupal", "Aquí tienes la Habitación Grupal: camas + camarotes, baño privado."),
-                ("Ver Habitación Grande", "Aquí tienes la Habitación Grande: 3–4 camas, luminosa, baño privado."),
-                ("Ver Casa Anexa en Circasia", "Casa Anexa en Circasia: 3 habitaciones, todas con baño privado; dos con vistas asombrosas."),
-                ("Ver todas las habitaciones", "Tenemos Estándar, Familiar, Grupal, Grande y Casa Anexa en Circasia."),
-            ]
-            if LANG == "Español"
-            else [
-                ("View Standard Room", "Standard Room: 1 double bed, bamboo style, bathroom across the hall."),
-                ("View Family Room", "Family Room: 2–3 double beds, private bath, mountain views."),
-                ("View Group Bunk", "Group Bunk: beds + bunks, private bathroom."),
-                ("View Large Room", "Large Room: 3–4 beds, bright, private bath."),
-                ("View Annex House in Circasia", "Annex House (Circasia): 3 rooms, all private bath; two with astonishing viewpoints."),
-                ("View all rooms", "Rooms available: Standard, Family, Group Bunk, Large, Annex House in Circasia."),
-            )
-        )
-        for label, content in buttons:
-            if st.button(label, use_container_width=True):
-                if "messages" not in st.session_state:
-                    st.session_state["messages"] = []
-                st.session_state["messages"].append({"role": "assistant", "content": content})
-        st.markdown("---")
-        st.subheader(TXT.get("faq_title", "Quick Prompts"))
-        for q in TXT.get("faqs", []):
-            if st.button(q, use_container_width=True):
-                if "messages" not in st.session_state:
-                    st.session_state["messages"] = []
-                st.session_state["messages"].append({"role": "user", "content": q})
-    with col_chat:
-        if "messages" not in st.session_state:
-            st.session_state["messages"] = []
-        if not st.session_state["messages"]:
-            st.info(TXT.get("welcome", "Welcome!"))
-        else:
-            for m in st.session_state["messages"]:
-                role = "user" if m.get("role") == "user" else "assistant"
-                st.chat_message(role).markdown(m.get("content", ""))
-                if role == "assistant":
-                    for r in match_rooms_from_text(m.get("content", "")):
-                        show_room_images(r, LANG)
+        # Quick prompt buttons
+    if LANG == "Español":
+        buttons = [
+            ("Ver Habitación Familiar", "Aquí tienes la Habitación Familiar: 2–3 camas dobles, baño privado, vista a la montaña."),
+            ("Ver Habitación Grupal", "Aquí tienes la Habitación Grupal: camas + camarotes, baño privado."),
+            ("Ver Habitación Grande", "Aquí tienes la Habitación Grande: 3–4 camas, luminosa, baño privado."),
+            ("Ver Casa Anexa en Circasia", "Casa Anexa en Circasia: 3 habitaciones, todas privadas."),
+            ("Ver todas las habitaciones", "Tenemos Estándar, Familiar, Grupal, Grande y Anexa."),
+        ]
+    else:
+        buttons = [
+            ("View Standard Room", "Standard Room: 1 double bed, bamboo style, bathroom access."),
+            ("View Family Room", "Family Room: 2–3 double beds, private bath, mountain view."),
+            ("View Group Bunk", "Group Bunk: beds + bunks, private bathroom."),
+            ("View Large Room", "Large Room: 3–4 beds, bright, private bath."),
+            ("View Annex House in Circasia", "Annex House (Circasia): 3 rooms, all private."),
+            ("View all rooms", "Rooms available: Standard, Family, Group Bunk, Large, Annex."),
+        ]
+
+    for label, content in buttons:
+        if st.button(label, use_container_width=True):
+            if "messages" not in st.session_state:
+                st.session_state["messages"] = []
+            st.session_state["messages"].append({"role": "assistant", "content": content})
+            
+    st.markdown("---")
+    st.subheader(TXT.get("faq_title", "Quick Prompts"))
+    for q in TXT.get("faqs", []):
+        if st.button(q, use_container_width=True):
+            if "messages" not in st.session_state:
+                st.session_state["messages"] = []
+            st.session_state["messages"].append({"role": "user", "content": q})
+        with col_chat:
+            if "messages" not in st.session_state:
+                st.session_state["messages"] = []
+            if not st.session_state["messages"]:
+                st.info(TXT.get("welcome", "Welcome!"))
+            else:
+                for m in st.session_state["messages"]:
+                    role = "user" if m.get("role") == "user" else "assistant"
+                    st.chat_message(role).markdown(m.get("content", ""))
+                    if role == "assistant":
+                        for r in match_rooms_from_text(m.get("content", "")):
+                            show_room_images(r, LANG)
         user_msg = st.chat_input(TXT.get("placeholder", "Type your question…"))
         if user_msg:
             st.session_state["messages"].append({"role": "user", "content": user_msg})

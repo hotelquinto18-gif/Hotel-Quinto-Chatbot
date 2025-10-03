@@ -1,7 +1,19 @@
 [theme]
 base="light"
-primaryColor="#0ea5e9"
-backgroundColor="#ffffff"
-secondaryBackgroundColor="#f6f8fa"
-textColor="#0f172a"
-font="sans serif"
+primaryColor="#6B8E23"
+backgroundColor="#FAF9F6"
+secondaryBackgroundColor="#EAE7DC"
+textColor="#3E2723"
+font="serif"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+port = 8501
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
